@@ -52,25 +52,25 @@ Board.prototype.placeShips = function () {
         }
 
   for(let ship in ships) {
-    let count = ships[ship],
-        dir = Math.random() < .5,
-        coord = [];
-
-    if(dir) {
-      coord = [
-                Math.floor(Math.random() * (10 - count)),
-                Math.floor(Math.random() * 10)
-              ];
-    } else {
-      coord = [
-                Math.floor(Math.random() * 10),
-                Math.floor(Math.random() * (10 - count))
-              ];
-    }
-
+    let count = ships[ship];
     let placed = false;
 
     while(placed === false) {
+      let dir = Math.random() < .5,
+          coord = [];
+
+      if(dir) {
+        coord = [
+                  Math.floor(Math.random() * (10 - count)),
+                  Math.floor(Math.random() * 10)
+                ];
+      } else {
+        coord = [
+                  Math.floor(Math.random() * 10),
+                  Math.floor(Math.random() * (10 - count))
+                ];
+      }
+      
       if(this.validCoord(count, dir, coord)) {
         this.placeShip(count, dir, coord);
         placed = true;
