@@ -25,6 +25,10 @@ function Board() {
   this.ships = [];
   this.grid = this.initGrid();
   this.placeShips();
+
+  document.addEventListener('DOMContentLoaded', () => {
+    this.initBoard();
+  });
 }
 
 Board.prototype.initGrid = function () {
@@ -70,7 +74,7 @@ Board.prototype.placeShips = function () {
                   Math.floor(Math.random() * (10 - count))
                 ];
       }
-      
+
       if(this.validCoord(count, dir, coord)) {
         this.placeShip(count, dir, coord);
         placed = true;
@@ -117,7 +121,43 @@ Board.prototype.validCoord = function (count, dir, coord) {
 Board.prototype.initBoard = function () {
   let main = document.getElementById('battleship');
 
+  for(let i = 0; i < 10; i ++) {
 
+    let row = document.createElement('ul');
+    row.id = 'row-' + i;
+    row.classList.add('row');
+
+    for(let j = 0; j < 10; j ++) {
+      let cell = document.createElement('li');
+      cell.id = 'cell-' + j;
+      cell.classList.add('cell');
+      cell.classList.add('hidden');
+
+      if(this.grid[i][j]) {
+        cell.addEventListener(
+          'click',
+          this.grid[i][j].handleClick(cell)
+        )
+      } else {
+        cell.addEventListener(
+          'click',
+          this.handleEmptyClick(cell)
+        )
+      }
+
+      row.appendChild(cell);
+    }
+
+    main.appendChild(row);
+  }
+};
+
+Board.prototype.handleEmptyClick = function (cell) {
+  // Handle click event logic w/ Game
+  return () => {
+    cell.classList.remove('hidden');
+    cell.classList.add('revealed');
+  }
 };
 
 function Player() {
@@ -127,6 +167,19 @@ function Player() {
 function Ship(size) {
   this.size = size;
 }
+
+Ship.prototype.handleClick = function (cell) {
+  return () => {
+    this.size --;
+
+    if(this.size === 0) {
+      alert('Ship murked!!');
+    }
+
+    cell.classList.remove('hidden');
+    cell.classList.add('hit');
+  }
+};
 
 const bored = new Board();
 console.log(bored);
