@@ -1,27 +1,55 @@
-// create board
-// create game func
-
-/*
-Game
-  Init
-  Play
-  Over
-Board
-  Init
-  Place Ships
-  Win?
-Player
-  Turns
-*/
-
 function Game() {
-  this.Board = new Board();
-  this.Player = new Player();
-
-
+  this.board = new Board(this);
+  this.player = new Player();
+  this.shipsCount = 17;
+  document.addEventListener('DOMContentLoaded', this.initLife)
 }
 
-function Board() {
+Game.prototype.handleClick = function(empty)  {
+  if(empty) {
+    this.player.life --;
+    this.updateLife();
+    if(this.player.life === 0) {
+      this.lose();
+    }
+  } else {
+    this.shipsCount --;
+    if(this.shipsCount === 0) {
+      this.win();
+    }
+  }
+}
+
+Game.prototype.initLife = function() {
+  let main = document.getElementById('battleship'),
+      life = document.createElement('div');
+
+  life.id = 'life';
+  life.innerText = 'life: 10';
+  main.appendChild(life);
+}
+Game.prototype.updateLife = function() {
+  let life = document.getElementById('life');
+
+  life.innerText = 'life: ' + this.player.life;
+}
+
+Game.prototype.lose = function () {
+  alert('You lost. You did not complete the system.');
+  this.over();
+};
+
+Game.prototype.win = function () {
+  alert('You win. You have completed the system.');
+  this.over();
+};
+
+Game.prototype.over = function () {
+  this.board.over();
+};
+
+function Board(game) {
+  this.game = game;
   this.ships = [];
   this.grid = this.initGrid();
   this.placeShips();
@@ -129,14 +157,14 @@ Board.prototype.initBoard = function () {
 
     for(let j = 0; j < 10; j ++) {
       let cell = document.createElement('li');
-      cell.id = 'cell-' + j;
+      cell.id = 'cell-' + i + '-' + j;
       cell.classList.add('cell');
       cell.classList.add('hidden');
 
       if(this.grid[i][j]) {
         cell.addEventListener(
           'click',
-          this.grid[i][j].handleClick(cell)
+          this.grid[i][j].handleClick(cell, this.game)
         )
       } else {
         cell.addEventListener(
@@ -153,23 +181,44 @@ Board.prototype.initBoard = function () {
 };
 
 Board.prototype.handleEmptyClick = function (cell) {
-  // Handle click event logic w/ Game
   return () => {
+    this.game.handleClick(true);
     cell.classList.remove('hidden');
     cell.classList.add('revealed');
   }
 };
 
-function Player() {
+Board.prototype.over = function () {
+  // Note that this doesn't work due to the functions being anonymous
+  for(let i = 0; i < 10; i ++) {
+    for(let j = 0; j < 10; j ++) {
+      let cell = document.getElementById('cell-' + i + '-' + j);
+      if(this.grid[i][j]) {
+        cell.removeEventListener(
+          'click',
+          this.grid[i][j].handleClick(cell, this.game)
+        );
+      } else {
+        cell.removeEventListener(
+          'click',
+          this.handleEmptyClick(cell)
+        )
+      }
+    }
+  }
+};
 
+function Player(life) {
+  this.life = 10;
 }
 
 function Ship(size) {
   this.size = size;
 }
 
-Ship.prototype.handleClick = function (cell) {
+Ship.prototype.handleClick = function (cell, game) {
   return () => {
+    game.handleClick(false);
     this.size --;
 
     if(this.size === 0) {
@@ -181,5 +230,5 @@ Ship.prototype.handleClick = function (cell) {
   }
 };
 
-const bored = new Board();
-console.log(bored);
+const game = new Game();
+console.log(game);
