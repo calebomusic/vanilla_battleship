@@ -28,6 +28,7 @@ Game.prototype.initLife = function() {
   life.innerText = 'life: 10';
   main.appendChild(life);
 }
+
 Game.prototype.updateLife = function() {
   let life = document.getElementById('life');
 
@@ -231,4 +232,3 @@ Ship.prototype.handleClick = function (cell, game) {
 };
 
 const game = new Game();
-console.log(game);
